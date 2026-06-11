@@ -1,6 +1,6 @@
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, FlatList
+  TouchableOpacity
 } from "react-native"
 import { useState } from "react"
 import { Colors } from "../../constants/colors"

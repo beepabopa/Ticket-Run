@@ -6,8 +6,8 @@ import { useLocalSearchParams, router } from "expo-router"
 import { useState } from "react"
 import { musicals } from "../../data/musicals"
 import { actors } from "../../data/actors"
-import { favoriteIds, followedActors } from "../../store/favorites"
-import { addAlarm, removeAlarm, isAlarmOn } from "../../store/alarms"
+import { followedActors, isFavorite, toggleFavorite, toggleFollowActor } from "../../store/favorites"
+import { isAlarmOn, toggleAlarm } from "../../store/alarms"
 import { Colors } from "../../constants/colors"
 
 const PLATFORM_URLS: Record<string, string> = {
@@ -21,7 +21,7 @@ export default function MusicalDetailScreen() {
   const { id } = useLocalSearchParams()
   const musical = musicals.find(item => item.id === id)
   const [alarmOn, setAlarmOn] = useState(musical ? isAlarmOn(musical.id) : false)
-  const [isFav, setIsFav] = useState(musical ? favoriteIds.includes(musical.id) : false)
+  const [isFav, setIsFav] = useState(musical ? isFavorite(musical.id) : false)
   const [followed, setFollowed] = useState<string[]>([...followedActors])
 
   if (!musical) return (
@@ -33,40 +33,21 @@ export default function MusicalDetailScreen() {
   const relatedActors = actors.filter(a => a.musicalIds.includes(musical.id))
 
   const handleAlarm = () => {
-    if (alarmOn) {
-      removeAlarm(musical.id)
-      setAlarmOn(false)
-      Alert.alert("알림 해제", `${musical.title} 알림을 해제했어요.`)
-    } else {
-      addAlarm(musical.id)
-      setAlarmOn(true)
-      Alert.alert("알림 등록 🔔", `${musical.openDate} 오픈 전에 알려드릴게요!`)
-    }
+    const next = toggleAlarm(musical.id)
+    setAlarmOn(next)
+    Alert.alert(next ? "알림 등록 🔔" : "알림 해제", next ? `${musical.openDate} 오픈 전에 알려드릴게요!` : `${musical.title} 알림을 해제했어요.`)
   }
 
   const handleFavorite = () => {
-    if (!favoriteIds.includes(musical.id)) {
-      favoriteIds.push(musical.id)
-      setIsFav(true)
-      Alert.alert("등록 완료 ⭐", `${musical.title}을 관심공연에 추가했어요.`)
-    } else {
-      const i = favoriteIds.indexOf(musical.id)
-      favoriteIds.splice(i, 1)
-      setIsFav(false)
-      Alert.alert("해제", `${musical.title}을 관심공연에서 제거했어요.`)
-    }
+    const next = toggleFavorite(musical.id)
+    setIsFav(next)
+    Alert.alert(next ? "등록 완료 ⭐" : "해제", next ? `${musical.title}을 관심공연에 추가했어요.` : `${musical.title}을 관심공연에서 제거했어요.`)
   }
 
   const handleFollowActor = (actor: typeof actors[0]) => {
-    if (followedActors.includes(actor.id)) {
-      const i = followedActors.indexOf(actor.id)
-      followedActors.splice(i, 1)
-      setFollowed([...followedActors])
-    } else {
-      followedActors.push(actor.id)
-      setFollowed([...followedActors])
-      Alert.alert("팔로우 ✅", `${actor.name} 배우를 팔로우했어요!`)
-    }
+    const next = toggleFollowActor(actor.id)
+    setFollowed([...followedActors])
+    Alert.alert(next ? "팔로우 ✅" : "팔로우 해제", next ? `${actor.name} 배우를 팔로우했어요!` : `${actor.name} 배우 팔로우를 해제했어요.`)
   }
 
   const handleBuyTicket = () => {

@@ -142,7 +142,7 @@ export default function MyPageScreen() {
               </View>
               <Text style={styles.cardSub}>📅 {item.date} · 📍 {item.venue}</Text>
               {item.cast ? <Text style={styles.cardSub}>👤 {item.cast}</Text> : null}
-              {item.memo ? <Text style={styles.cardMemo}>"{item.memo}"</Text> : null}
+              {item.memo ? <Text style={styles.cardMemo}>“{item.memo}”</Text> : null}
             </View>
           ))}
         </View>
